@@ -1,0 +1,37 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By 
+from selenium.webdriver.common.keys import Keys
+import pyautogui
+import time
+import re
+
+url = "https://www.google.com/maps/"
+#example
+endereco = "R. Geraldo Belo, 1240, Queimadas - PB, 58475-000, Brasil"
+driver = webdriver.Chrome()
+driver.get(url)
+caixa_pesquisa = driver.find_element(By.XPATH, "//input[@id='searchboxinput']")
+caixa_pesquisa.send_keys(endereco)
+caixa_pesquisa.send_keys(Keys.ENTER)
+time.sleep(3)
+link = driver.current_url
+
+def extrair_coordenadas(link):
+    padrao = r'@(-?\d+\.\d+),(-?\d+\.\d+)'
+    correspondencias = re.search(padrao, link)
+
+    if correspondencias:
+        latitude = float(correspondencias.group(1))
+        longitude = float(correspondencias.group(2))
+        return latitude, longitude
+    else:
+        return None
+
+latitude, longitude = extrair_coordenadas(link)
+
+if latitude is not None and longitude is not None:
+    print("Latitude:", latitude)
+    print("Longitude:", longitude)
+else:
+    print("Não foi possível extrair as coordenadas do link.")
+    
